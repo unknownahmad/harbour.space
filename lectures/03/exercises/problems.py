@@ -102,11 +102,11 @@ class UniqueConsecutiveIterator:
         return self
 
     def __next__(self) -> Any:
-        while self.inex<len(self.values):
+        while self.index<len(self.values):
             current_value=self.values[self.index]
             self.index=self.index+1
             if current_value != self.last_seen:
-                self.last_sen=current_value
+                self.last_seen=current_value
                 return current_value
         raise StopIteration
 
@@ -182,7 +182,7 @@ def read_words(filename: str) -> Iterator[str]:
     >>> list(read_words("sample.txt"))
     ['one', 'two', 'three']
     """
-    with open(filename,str) as f:
+    with open(filename,"r") as f:
         for i in f:
             j=i.split()
             for s in j:
