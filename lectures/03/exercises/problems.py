@@ -25,6 +25,8 @@ from __future__ import annotations
 
 from collections.abc import Callable, Iterable, Iterator, Sequence
 from typing import Any
+from functools import wraps
+import time
 
 
 class Countdown:
@@ -246,7 +248,15 @@ def log_calls(func: Callable[..., Any]) -> Callable[..., Any]:
     add(2, 3) -> 5
     5
     """
-    raise NotImplementedError
+    @wraps(func)
+    def wrapper(*args:Any,**kwargs:Any):
+        pos_args=[str(arg) for arg in args]
+        kw_args=[f"{k}={k}" for k,v in kwargs.items()]
+        all_args=", ".join(pos_args+kw_args)
+        result= func(*args,**kwargs)
+        print(f"{func.__name__}({all_args}) -> {result}")
+        return result
+    return wrapper
 
 
 def measure_time(func: Callable[..., Any]) -> Callable[..., Any]:
@@ -262,7 +272,14 @@ def measure_time(func: Callable[..., Any]) -> Callable[..., Any]:
     >>> work()
     done
     """
-    raise NotImplementedError
+    @wraps(func)
+    def wrapper(*args:Any,**kwargs:Any):
+        start=time.perf_counter()
+        result= func(*args,**kwargs)
+        elapsed=(time.perf_counter()-start)*100
+        print(f"Executed in {elapsed} ms")
+        return result
+    return wrapper
 
 
 def count_calls(func: Callable[..., Any]) -> Callable[..., Any]:
@@ -280,7 +297,12 @@ def count_calls(func: Callable[..., Any]) -> Callable[..., Any]:
     >>> ping.calls
     2
     """
-    raise NotImplementedError
+    @wraps(func)
+    def wrapper(*args:Any,**kwargs:Any):
+        wrapper.calls+=1
+        return func(*args,**kwargs)
+    wrapper.calls=0
+    return wrapper
 
 
 def ensure_non_negative(func: Callable[..., Any]) -> Callable[..., Any]:
@@ -295,7 +317,13 @@ def ensure_non_negative(func: Callable[..., Any]) -> Callable[..., Any]:
     >>> diff(5, 2)
     3
     """
-    raise NotImplementedError
+    @wraps(func)
+    def wrapper(*arg:Any,**kwargs:Any):
+        result=func(*arg,**kwargs)
+        if result<0:
+            raise ValueError
+        return result
+    return wrapper
 
 
 def retry(times: int) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
@@ -309,7 +337,20 @@ def retry(times: int) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
     ... def flaky():
     ...     ...
     """
-    raise NotImplementedError
+    if times<0:
+        raise ValueError
+    def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
+        @wraps(func)
+        def wrapper(*args: Any, **kwargs: Any) -> Any:
+            last_error = None
+            for _ in range(times + 1):
+                try:
+                    return func(*args, **kwargs)
+                except Exception as e:
+                    last_error = e
+            raise last_error
+        return wrapper
+    return decorator
 
 
 def lru_cache(maxsize: int) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
