@@ -11,13 +11,20 @@ Task:
 """
 
 import requests
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 URL = "https://example.com"
 
 
 def main() -> None:
     # TODO: implement GET request and print HTML response
-    pass
+    response=requests.get(URL, verify=False)
+    response.raise_for_status()
+    print(response.status_code)
+    print(response.headers["Content-Type"])
+    if "text/html" in response.headers["Content-Type"]:
+        print(response.text)
 
 
 if __name__ == "__main__":
