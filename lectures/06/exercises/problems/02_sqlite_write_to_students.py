@@ -26,6 +26,12 @@ STUDENTS = [
 def main() -> None:
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
+    
+    
+    cur.executemany(
+        "INSERT INTO students (name, age, email, track) VALUES (?, ?, ?, ?)", 
+        STUDENTS
+    )
 
     # TODO: insert STUDENTS rows here.
     # cur.executemany("INSERT INTO students (name, age, email, track) VALUES (?, ?, ?, ?)", STUDENTS)

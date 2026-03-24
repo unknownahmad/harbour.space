@@ -15,6 +15,23 @@ DB_PATH = "school.db"
 def main() -> None:
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
+    
+    
+    cur.execute("SELECT * FROM students")
+    rows = cur.fetchall()
+    print("All Students")
+    for row in rows:
+        print(row)
+    cur.execute("SELECT name, email FROM students")
+    name_email_rows = cur.fetchall()
+    print("\n Names and Emails")
+    for row in name_email_rows:
+        print(row)
+    cur.execute("SELECT * FROM students WHERE email = ?", ("ana@example.com",))
+    one_row = cur.fetchone()
+    print("\nSingle Row for Ana")
+    print(one_row)
+    conn.close()
 
     # TODO: SELECT * FROM students
     # rows = cur.fetchall()
