@@ -12,7 +12,7 @@ from collections.abc import Callable
 
 
 def extract_opnames(source: str) -> list[str]:
-    """Mission 1: inspect bytecode produced from source text.
+    """Mission 1 (Optional): inspect bytecode produced from source text.
 
     Goal:
         Show that Python executes bytecode instructions.
